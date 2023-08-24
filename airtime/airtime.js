@@ -101,7 +101,7 @@ const LipadEncryption = require('../encryption/encryption');
 const accessKey = "t9BbimKKJebKnjEya34iN68xtipG7j"
 const IVKey = "p6BbimKKJebKnjEya34iN68xtipG7j";
 const secretKey = "C6BbimKKJebKnjEya34iN68xtipG7j";
-
+const consumerKey = "0GtzQyR9UkahffE0AGCZ3GWHlGxVar";
 let payload = {
     msisdn: "+254700000000",
     account_number: "oid39",
@@ -112,7 +112,7 @@ let payload = {
     customer_email: "johndoe@mail.com",
     customer_first_name: "John",
     customer_last_name: "Doe",
-    merchant_transaction_id: "txn_id_342",
+    merchant_transaction_id: "35",
     preferred_payment_option_code: "",
     callback_url: "https://webhook.site/6c933f61-d6da-4f8e-8a44-bf0323eb8ad6",
     request_amount: "100",
@@ -129,8 +129,16 @@ encryption.validatePayload(payload);
 
 const payloadStr = JSON.stringify(payload);
 
+const accessToken = encryption.getAccessToken(consumerKey, secretKey);
+console.log('Access token', accessToken);
 // Create object of the Encryption class
-
+encryption.getCheckoutStats(payload.merchant_transaction_id, accessToken)
+    .then(checkoutData => {
+        console.log('Checkout Data:', checkoutData);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
 // call encrypt method
 let encryptedPayload = encryption.encrypt(payloadStr);
 

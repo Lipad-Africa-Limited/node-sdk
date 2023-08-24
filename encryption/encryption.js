@@ -1,4 +1,5 @@
 const crypto = require("crypto");
+const https = require('https');
 class LipadEncryption{
     constructor(ivKey, secretKey, algorithm) {
         this.IVKey = ivKey;
@@ -68,6 +69,43 @@ validatePayload(obj){
 
         return base64Str2;
 
+    }
+    getAccessToken(consumerKey, secretKey) {
+        const tokenInput = `${consumerKey}:${secretKey}`;
+        const token = Buffer.from(tokenInput).toString('base64');
+        return token;
+    }
+
+    getCheckoutStats(merchant_transaction_id, token) {
+        const apiUrl = `https://dev.checkout-api.lipad.io/api/v1/checkout/request/status${merchant_transaction_id}`;
+
+        return new Promise((resolve, reject) => {
+            const options = {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            };
+
+            const req = https.request(apiUrl, options, res => {
+                let data = '';
+
+                res.on('data', chunk => {
+                    data += chunk;
+                });
+
+                res.on('end', () => {
+                    resolve(JSON.parse(data));
+                });
+            });
+
+            req.on('error', error => {
+                console.error('Error:', error);
+                reject(error);
+            });
+
+            req.end();
+        });
     }
 }
 
