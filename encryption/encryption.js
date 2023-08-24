@@ -108,5 +108,4 @@ validatePayload(obj){
         });
     }
 }
-
 module.exports.Encryption = LipadEncryption;
