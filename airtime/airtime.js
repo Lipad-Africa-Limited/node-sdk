@@ -101,7 +101,6 @@ const LipadEncryption = require('../encryption/encryption');
 const accessKey = "t9BbimKKJebKnjEya34iN68xtipG7j"
 const IVKey = "p6BbimKKJebKnjEya34iN68xtipG7j";
 const secretKey = "C6BbimKKJebKnjEya34iN68xtipG7j";
-const algorithm = "aes-256-cbc";
 
 let payload = {
     msisdn: "+254700000000",
@@ -124,11 +123,13 @@ let payload = {
     language_code: "en",
     service_code: "<Client service code>"
 };
+//Validate payload before encrypting
+let encryption = new LipadEncryption.Encryption(IVKey, secretKey);
+encryption.validatePayload(payload);
 
 const payloadStr = JSON.stringify(payload);
 
 // Create object of the Encryption class
-let encryption = new LipadEncryption.Encryption(IVKey, secretKey, algorithm);
 
 // call encrypt method
 let encryptedPayload = encryption.encrypt(payloadStr);
