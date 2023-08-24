@@ -42,7 +42,6 @@ encryption.getCheckoutStats(payload.merchant_transaction_id, accessToken)
 // call encrypt method
 let encryptedPayload = encryption.encrypt(payloadStr);
 
-// console.log(encryptedPayload);
 
 const checkoutUrl =
     'https://checkout2.dev.lipad.io/?access_key=' +
