@@ -1,29 +1,37 @@
 const crypto = require("crypto");
-// function LipadEncryption(payload) {
-//     const IVKey = process.env.IVKey;
-//     const consumerSecret = process.env.consumerSecret;
-//     const algorithm = "aes-256-cbc";
-//
-//     if (!IVKey || !consumerSecret) {
-//         throw new Error("IVKey and consumerSecret must be provided in environment variables.");
-//     }
-//     let jsonStringPayload = JSON.stringify(payload);
-//     let key = crypto.createHash("sha256").update(IVKey).digest("hex").substring(0, 16);
-//     key = Buffer.from(key);
-//     let secret = crypto.createHash("sha256").update(consumerSecret).digest("hex").substring(0, 32);
-//     secret = Buffer.from(secret);
-//     const cipher = crypto.createCipheriv(algorithm, secret, key);
-//     let encryptedData = cipher.update(jsonStringPayload, "utf-8", "hex");
-//     encryptedData += cipher.final("hex");
-//     let encryptedPayload = Buffer.from(encryptedData, "hex").toString("base64");
-//     return encryptedPayload;
-// }
-// module.exports = LipadEncryption;
 class LipadEncryption{
     constructor(ivKey, secretKey, algorithm) {
         this.IVKey = ivKey;
         this.secretKey = secretKey;
-        this.algorithm = algorithm;
+        this.algorithm = "aes-256-cbc";
+    }
+validatePayload(obj){
+        const requiredKeys = [
+        "msisdn",
+        "account_number",
+        "country_code",
+        "currency_code",
+        "client_code",
+        "due_date",
+        "customer_email",
+        "customer_first_name",
+        "customer_last_name",
+        "merchant_transaction_id",
+        "preferred_payment_option_code",
+        "callback_url",
+        "request_amount",
+        "request_description",
+        "success_redirect_url",
+        "fail_redirect_url",
+        "invoice_number",
+        "language_code",
+        "service_code",
+];
+        for (const key of requiredKeys) {
+            if (!(key in obj)) {
+                throw new Error(`Missing required key: ${key}`);
+            }
+        }
     }
 
     encrypt(payload){
