@@ -1,9 +1,10 @@
 const crypto = require("crypto");
 const https = require('https');
+const querystring = require('querystring');
 class LipadEncryption{
-    constructor(ivKey, secretKey, algorithm) {
+    constructor(ivKey, consumerSecret) {
         this.IVKey = ivKey;
-        this.secretKey = secretKey;
+        this.consumerSecret = consumerSecret;
         this.algorithm = "aes-256-cbc";
     }
 validatePayload(obj){
@@ -38,7 +39,7 @@ validatePayload(obj){
     encrypt(payload){
         let secret = crypto
             .createHash('sha256')
-            .update(this.secretKey)
+            .update(this.consumerSecret)
             .digest('hex')
             .substring(0, 32);
 
@@ -70,20 +71,60 @@ validatePayload(obj){
         return base64Str2;
 
     }
-    getAccessToken(consumerKey, secretKey) {
-        const tokenInput = `${consumerKey}:${secretKey}`;
-        const token = Buffer.from(tokenInput).toString('base64');
-        return token;
+    async getAccessToken(consumerKey, consumerSecret) {
+        const authData = {
+            consumerKey: consumerKey,
+            consumerSecret: consumerSecret
+        };
+
+        const postData = querystring.stringify(authData);
+
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Length': Buffer.byteLength(postData)
+            }
+        };
+
+        const apiUrl = 'https://dev.checkout-api.lipad.io/api/v1/api-auth/access-token';
+
+        return new Promise((resolve, reject) => {
+            const req = https.request(apiUrl, options, res => {
+                let data = '';
+
+                res.on('data', chunk => {
+                    data += chunk;
+                });
+
+                res.on('end', () => {
+                    const response = JSON.parse(data);
+                    if (response.access_token) {
+                        resolve(response.access_token);
+                    } else {
+                        reject(new Error('Access token not found in response'));
+                    }
+                });
+            });
+
+            req.on('error', error => {
+                console.error('Error:', error);
+                reject(error);
+            });
+
+            req.write(postData); // Write the serialized data to the request body
+            req.end();
+        });
     }
 
-    getCheckoutStats(merchant_transaction_id, token) {
+    async getCheckoutStats(merchant_transaction_id, access_token) {
         const apiUrl = `https://dev.checkout-api.lipad.io/api/v1/checkout/request/status${merchant_transaction_id}`;
 
         return new Promise((resolve, reject) => {
             const options = {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${access_token}`
                 }
             };
 

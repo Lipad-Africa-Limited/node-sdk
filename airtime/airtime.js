@@ -1,7 +1,7 @@
 const LipadEncryption = require('../encryption/encryption');
 const accessKey = "t9BbimKKJebKnjEya34iN68xtipG7j"
 const IVKey = "p6BbimKKJebKnjEya34iN68xtipG7j";
-const secretKey = "C6BbimKKJebKnjEya34iN68xtipG7j";
+const consumerSecret = "C6BbimKKJebKnjEya34iN68xtipG7j";
 const consumerKey = "0GtzQyR9UkahffE0AGCZ3GWHlGxVar";
 let payload = {
     msisdn: "+254700000000",
@@ -25,12 +25,12 @@ let payload = {
     service_code: "<Client service code>"
 };
 //Validate payload before encrypting
-let encryption = new LipadEncryption.Encryption(IVKey, secretKey);
+let encryption = new LipadEncryption.Encryption(IVKey, consumerSecret);
 encryption.validatePayload(payload);
 
 const payloadStr = JSON.stringify(payload);
 
-const accessToken = encryption.getAccessToken(consumerKey, secretKey);
+const accessToken = encryption.getAccessToken(consumerKey, consumerSecret);
 console.log('Access token', accessToken);
 encryption.getCheckoutStats(payload.merchant_transaction_id, accessToken)
     .then(checkoutData => {

@@ -18,31 +18,47 @@ This class relies on the built-in crypto module, so no additional installations 
 
     ```javascript
     const ivKey = "your_IV_key";
-    const secretKey = "your_secret_key";
-    const algorithm = "aes-256-cbc";
+    const consumerSecret = "your_secret_key";
 
-    const lipadEncryptor = new Encryption(ivKey, secretKey, algorithm);
+   let payload = {};
+    let encryption = new LipadEncryption.Encryption(IVKey, consumerSecret);
     ```
 
-3. **Encrypt a payload using the encrypt method:**
+3. **Validate a payload using the validatePayload method:**
+
+    ```javascript
+    encryption.validatePayload(payload);
+    ```
+
+4. **Encrypt a payload using the encrypt method:**
 
     ```javascript
     const payload = "your_payload";
-    const encryptedPayload = lipadEncryptor.encrypt(payload);
+    let encryptedPayload = encryption.encrypt(payloadStr);
 
     console.log("Encrypted Payload:", encryptedPayload);
     ```
 
+5. **Retrieve checkout status using the getCheckoutStats method:**
+
+    ```javascript
+    encryption.getCheckoutStats(payload.merchant_transaction_id, accessToken)
+    .then(checkoutData => {
+        console.log('Checkout Data:', checkoutData);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+    ```
+
 ## API
 
-### `LipadEncryption(ivKey, secretKey, algorithm)`
+### `LipadEncryption(ivKey, consumerSecret)`
 
 Creates an instance of the LipadEncryption class.
 
 - `ivKey`: The IV key used for encryption.
-- `secretKey`: The secret key used for encryption.
-- `algorithm`: The encryption algorithm to use (e.g., "aes-256-cbc").
-
+- `consumerSecret`: The secret key used for encryption.
 ### `encrypt(payload)`
 
 Encrypts a given payload.
@@ -51,18 +67,56 @@ Encrypts a given payload.
 
 Returns the encrypted payload in base64-encoded format.
 
+### `validatePayload(payload)`
+
+Validates the required properties of a given payload object.
+
+- `payload`: The payload object to be validated.
+
+Throws an error if any required property is missing.
+
+### `getCheckoutStats(merchant_transaction_id, accessToken)`
+
+Retrieves checkout status for a specific merchant transaction ID.
+
+- `merchant_transaction_id`: The ID of the merchant transaction.
+- `accessToken`: The access token for authentication.
+
+Returns a Promise that resolves with the checkout data.
+
 ## Example
 
 ```javascript
 const { Encryption } = require("lipad-encryption");
 
-const ivKey = "your_IV_key";
-const secretKey = "your_secret_key";
-const algorithm = "aes-256-cbc";
+const IVKey = "your_IV_key";
+const consumerSecret = "your_secret_key";
 
-const lipadEncryptor = new Encryption(ivKey, secretKey, algorithm);
+const lipadEncryption = new Encryption(IVKey, consumerSecret);
 
 const payload = "your_payload";
 const encryptedPayload = lipadEncryptor.encrypt(payload);
 
 console.log("Encrypted Payload:", encryptedPayload);
+
+const payloadToValidate = {
+    // your payload properties
+};
+
+try {
+    lipadEncryption.validatePayload(payloadToValidate);
+    console.log("Payload is valid.");
+} catch (error) {
+    console.error("Payload validation error:", error.message);
+}
+
+const merchant_transaction_id = "your_transaction_id";
+const accessToken = "your_access_token";
+
+lipadEncryption.getCheckoutStats(merchant_transaction_id, accessToken)
+    .then(checkoutData => {
+        console.log("Checkout Data:", checkoutData);
+    })
+    .catch(error => {
+        console.error("Error:", error);
+    });
