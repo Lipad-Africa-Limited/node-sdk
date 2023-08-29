@@ -71,6 +71,7 @@ validatePayload(obj){
         return base64Str2;
 
     }
+
     async getAccessToken(consumerKey, consumerSecret) {
         const authData = {
             consumerKey: consumerKey,
@@ -87,7 +88,7 @@ validatePayload(obj){
             }
         };
 
-        const apiUrl = 'https://dev.checkout-api.lipad.io/api/v1/api-auth/access-token';
+        const apiUrl = 'https://checkout.api.uat.lipad.io/api/v1/api-auth/access-token';
 
         return new Promise((resolve, reject) => {
             const req = https.request(apiUrl, options, res => {
@@ -117,7 +118,7 @@ validatePayload(obj){
         });
     }
 
-    async getCheckoutStats(merchant_transaction_id, access_token) {
+    async getCheckoutStatus(merchant_transaction_id, access_token) {
         const apiUrl = `https://dev.checkout-api.lipad.io/api/v1/checkout/request/status${merchant_transaction_id}`;
 
         return new Promise((resolve, reject) => {
@@ -147,6 +148,16 @@ validatePayload(obj){
 
             req.end();
         });
+    }
+    async getAccessTokenandCheckoutStatus(merchant_transaction_id, consumerKey, consumerSecret) {
+        try {
+            const access_token = await this.getAccessToken(consumerKey, consumerSecret);
+            const status = await this.getCheckoutStatus(merchant_transaction_id, access_token);
+            return status;
+        } catch (error) {
+            console.error('Error:', error);
+            throw error;
+        }
     }
 }
 module.exports.Encryption = LipadEncryption;
