@@ -149,7 +149,7 @@ validatePayload(obj){
             req.end();
         });
     }
-    async getAccessTokenandCheckoutStatus(merchant_transaction_id, consumerKey, consumerSecret) {
+    async getCheckoutStatus(merchant_transaction_id, consumerKey, consumerSecret) {
         try {
             const access_token = await this.getAccessToken(consumerKey, consumerSecret);
             const status = await this.getCheckoutStatus(merchant_transaction_id, access_token);

@@ -41,7 +41,7 @@ const payloadStr = JSON.stringify(payload);
 //     });
 // call encrypt method
 try {
-    const checkoutData = encryption.getAccessTokenandCheckoutStatus(
+    const checkoutData = encryption.getCheckoutStatus(
         payload.merchant_transaction_id,
         consumerKey,
         consumerSecret
