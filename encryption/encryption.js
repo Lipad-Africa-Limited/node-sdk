@@ -118,7 +118,7 @@ validatePayload(obj){
         });
     }
 
-    async getCheckoutStatus(merchant_transaction_id, access_token) {
+    async getCheckoutStats(merchant_transaction_id, access_token) {
         const apiUrl = `https://dev.checkout-api.lipad.io/api/v1/checkout/request/status${merchant_transaction_id}`;
 
         return new Promise((resolve, reject) => {
@@ -152,7 +152,7 @@ validatePayload(obj){
     async getCheckoutStatus(merchant_transaction_id, consumerKey, consumerSecret) {
         try {
             const access_token = await this.getAccessToken(consumerKey, consumerSecret);
-            const status = await this.getCheckoutStatus(merchant_transaction_id, access_token);
+            const status = await this.getCheckoutStats(merchant_transaction_id, access_token);
             return status;
         } catch (error) {
             console.error('Error:', error);
