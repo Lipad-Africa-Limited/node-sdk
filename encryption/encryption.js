@@ -88,7 +88,7 @@ validatePayload(obj){
             }
         };
 
-        const apiUrl = 'https://checkout.api.uat.lipad.io/api/v1/api-auth/access-token';
+        const apiUrl = 'https://uat.checkout-api.lipad.io/api/v1/api-auth/access-token';
 
         return new Promise((resolve, reject) => {
             const req = https.request(apiUrl, options, res => {
@@ -105,6 +105,7 @@ validatePayload(obj){
                             resolve(response.access_token);
                         } else {
                             reject(new Error('Access token not found in response'));
+                            console.log('Response', response);
                         }
                     } catch (error){
                         reject(new Error('Error parsing JSON response:' + error.message));
@@ -123,7 +124,7 @@ validatePayload(obj){
     }
 
     async getCheckoutStats(merchant_transaction_id, access_token) {
-        const apiUrl = `https://dev.checkout-api.lipad.io/api/v1/checkout/request/status${merchant_transaction_id}`;
+        const apiUrl = `https://uat.checkout-api.lipad.io/api/v1/checkout/request/status?merchant_transaction_id=${merchant_transaction_id}`;
 
         return new Promise((resolve, reject) => {
             const options = {
@@ -156,7 +157,9 @@ validatePayload(obj){
     async getCheckoutStatus(merchant_transaction_id, consumerKey, consumerSecret) {
         try {
             const access_token = await this.getAccessToken(consumerKey, consumerSecret);
+            console.log('Access Token', access_token);
             const status = await this.getCheckoutStats(merchant_transaction_id, access_token);
+            console.log('Checkout Status:', status);
             return status;
         } catch (error) {
             console.error('Error:', error);
