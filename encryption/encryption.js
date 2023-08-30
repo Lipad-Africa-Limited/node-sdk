@@ -99,11 +99,15 @@ validatePayload(obj){
                 });
 
                 res.on('end', () => {
-                    const response = JSON.parse(data);
-                    if (response.access_token) {
-                        resolve(response.access_token);
-                    } else {
-                        reject(new Error('Access token not found in response'));
+                    try {
+                        const response = JSON.parse(data);
+                        if (response.access_token) {
+                            resolve(response.access_token);
+                        } else {
+                            reject(new Error('Access token not found in response'));
+                        }
+                    } catch (error){
+                        reject(new Error('Error parsing JSON response:' + error.message));
                     }
                 });
             });
