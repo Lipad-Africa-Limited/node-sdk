@@ -30,16 +30,6 @@ encryption.validatePayload(payload);
 
 const payloadStr = JSON.stringify(payload);
 
-// const accessToken = encryption.getAccessToken(consumerKey, consumerSecret);
-// console.log('Access token', accessToken);
-// encryption.getCheckoutStatus(payload.merchant_transaction_id, accessToken)
-//     .then(checkoutData => {
-//         console.log('Checkout Data:', checkoutData);
-//     })
-//     .catch(error => {
-//         console.error('Error:', error);
-//     });
-// call encrypt method
 try {
     const checkoutData = encryption.getCheckoutStatus(
         payload.merchant_transaction_id,
@@ -51,14 +41,6 @@ try {
 
 
 let encryptedPayload = encryption.encrypt(payloadStr);
-
-
-// const checkoutUrl =
-//     'https://checkout2.dev.lipad.io/?access_key=' +
-//     encodeURIComponent(accessKey) +
-//     '&payload=' +
-//     encodeURIComponent(encryptedPayload);
-// console.log('Checkout URL', checkoutUrl)
 
     const checkoutUrl =
         'https://checkout2.dev.lipad.io/?access_key=' +
