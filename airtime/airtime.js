@@ -1,8 +1,9 @@
 const LipadEncryption = require('../encryption/encryption');
-const accessKey = "t9BbimKKJebKnjEya34iN68xtipG7j"
+const accessKey = "t9BbimKKJebKnjEya34iN68xtipG7j";
 const IVKey = "p6BbimKKJebKnjEya34iN68xtipG7j";
 const consumerSecret = "C6BbimKKJebKnjEya34iN68xtipG7j";
 const consumerKey = "0GtzQyR9UkahffE0AGCZ3GWHlGxVar";
+
 let payload = {
     msisdn: "+254714254393",
     account_number: "oid39",
@@ -13,7 +14,7 @@ let payload = {
     customer_email: "johndoe@mail.com",
     customer_first_name: "John",
     customer_last_name: "Doe",
-    merchant_transaction_id: "46",
+    merchant_transaction_id: "60",
     preferred_payment_option_code: "",
     callback_url: "https://webhook.site/6c933f61-d6da-4f8e-8a44-bf0323eb8ad6",
     request_amount: "100",
@@ -24,31 +25,39 @@ let payload = {
     language_code: "en",
     service_code: "DEMCHE1"
 };
-//Validate payload before encrypting
+
+// Create an instance of LipadEncryption
 let encryption = new LipadEncryption.Encryption(IVKey, consumerSecret);
-encryption.validatePayload(payload);
 
-const payloadStr = JSON.stringify(payload);
+async function main() {
+    try {
+        // Validate payload before encrypting
+        encryption.validatePayload(payload);
 
-try {
-    const checkoutData = encryption.getCheckoutStatus(
-        payload.merchant_transaction_id,
-        consumerKey,
-        consumerSecret
-    );
+        const payloadStr = JSON.stringify(payload);
 
-    console.log('Checkout Data:', checkoutData);
+        // Get access token
+        const access_token = await encryption.getAccessToken(consumerKey, consumerSecret, payload);
+        console.log('Access Token', access_token);
 
+        // Encrypt the payload
+        let encryptedPayload = encryption.encrypt(payloadStr);
 
-let encryptedPayload = encryption.encrypt(payloadStr);
+        // Build the checkout URL
+        const checkoutUrl =
+            'https://checkout2.dev.lipad.io/?access_key=' +
+            encodeURIComponent(accessKey) +
+            '&payload=' +
+            encodeURIComponent(encryptedPayload);
 
-    const checkoutUrl =
-        'https://checkout2.dev.lipad.io/?access_key=' +
-        encodeURIComponent(accessKey) +
-        '&payload=' +
-        encodeURIComponent(encryptedPayload);
+        console.log('Checkout URL', checkoutUrl);
 
-    console.log('Checkout URL', checkoutUrl);
-} catch (error) {
-    console.error('Error:', error);
+        // Get checkout status
+        const checkoutData = await encryption.getCheckoutStatus(payload.merchant_transaction_id, consumerKey, consumerSecret, payload);
+        console.log('Checkout Status', checkoutData);
+    } catch (error) {
+        console.error('Error:', error);
+    }
 }
+
+main();
