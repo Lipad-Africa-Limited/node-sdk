@@ -11,7 +11,7 @@ This class relies on the built-in crypto module, so no additional installations 
 1. **Import the LipadEncryption class:**
 
     ```javascript
-    const Encryption = require("lipad-encryption");
+    const LipadCheckout = require('../checkout/checkout');
     ```
 
 2. **Create an instance of LipadEncryption by providing the required parameters:**
@@ -21,20 +21,20 @@ This class relies on the built-in crypto module, so no additional installations 
     const consumerSecret = "your_secret_key";
 
     let payload = {};
-    let encryption = new LipadEncryption.Encryption(IVKey, consumerSecret);
+    let checkout = new LipadCheckout.Checkout(IVKey, consumerSecret);
     ```
 
 3. **Validate a payload using the validatePayload method:**
 
     ```javascript
-    encryption.validatePayload(payload);
+    checkout.validatePayload(payload);
     ```
 
 4. **Encrypt a payload using the encrypt method:**
 
     ```javascript
     const payload = "your_payload";
-    let encryptedPayload = encryption.encrypt(payloadStr);
+    let encryptedPayload = checkout.encrypt(payloadStr);
 
     console.log("Encrypted Payload:", encryptedPayload);
     ```
@@ -42,7 +42,7 @@ This class relies on the built-in crypto module, so no additional installations 
 5. **Retrieve checkout status using the getCheckoutStatus method:**
 
     ```javascript
-    encryption.getCheckoutStatus(
+    checkout.getCheckoutStatus(
         merchant_transaction_id,
         consumerKey,
         consumerSecret,
@@ -97,12 +97,12 @@ Returns a Promise that resolves with the checkout data.
 ## Example
 
 ```javascript
-const { Encryption } = require("lipad-encryption");
+const LipadCheckout = require('../checkout/checkout');
 
 const IVKey = "your_IV_key";
 const consumerSecret = "your_secret_key";
 
-const lipadEncryption = new Encryption(IVKey, consumerSecret);
+let checkout = new LipadCheckout.Checkout(IVKey, consumerSecret);
 
 const payload = "your_payload";
 const encryptedPayload = lipadEncryptor.encrypt(payload);
@@ -114,7 +114,7 @@ const payloadToValidate = {
 };
 
 try {
-    lipadEncryption.validatePayload(payloadToValidate);
+    checkout.validatePayload(payload);
     console.log("Payload is valid.");
 } catch (error) {
     console.error("Payload validation error:", error.message);
@@ -124,15 +124,9 @@ const merchant_transaction_id = "your_transaction_id";
 const consumerKey = "your_consumer_key";
 const consumerSecret = "your_consumer_secret";
 
-lipadEncryption.getCheckoutStatus(
-    merchant_transaction_id,
-    consumerKey,
-    consumerSecret,
-    payload
-)
-    .then(checkoutData => {
-        console.log("Checkout Data:", checkoutData);
-    })
-    .catch(error => {
-        console.error("Error:", error);
-    });
+// Get checkout status and Access Token
+     const checkoutData = await checkout.getCheckoutStatus(payload.merchant_transaction_id, consumerKey, consumerSecret, payload);
+     console.log('Checkout Status', checkoutData);
+   } catch (error) {
+        console.error('Error:', error);
+    }
