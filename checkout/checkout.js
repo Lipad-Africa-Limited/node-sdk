@@ -2,7 +2,7 @@ const crypto = require("crypto");
 const https = require('https');
 const querystring = require('querystring');
 
-class LipadEncryption {
+class LipadCheckout {
     constructor(ivKey, consumerSecret) {
         this.IVKey = ivKey;
         this.consumerSecret = consumerSecret;
@@ -177,5 +177,5 @@ class LipadEncryption {
     }
 }
 
-module.exports.Encryption = LipadEncryption;
+module.exports.Checkout = LipadCheckout;
 
