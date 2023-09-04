@@ -14,7 +14,7 @@ let payload = {
     customer_email: "johndoe@mail.com",
     customer_first_name: "John",
     customer_last_name: "Doe",
-    merchant_transaction_id: "60",
+    merchant_transaction_id: "36",
     preferred_payment_option_code: "",
     callback_url: "https://webhook.site/6c933f61-d6da-4f8e-8a44-bf0323eb8ad6",
     request_amount: "100",
@@ -36,12 +36,13 @@ async function main() {
 
         const payloadStr = JSON.stringify(payload);
 
-        // Get access token
-        const access_token = await encryption.getAccessToken(consumerKey, consumerSecret, payload);
-        console.log('Access Token', access_token);
-
         // Encrypt the payload
         let encryptedPayload = encryption.encrypt(payloadStr);
+        // console.log('Encrypted Payload', encryptedPayload);
+
+        // Get access token
+        const access_token = await encryption.getAccessToken(consumerKey, consumerSecret);
+        console.log('Access Token', access_token);
 
         // Build the checkout URL
         const checkoutUrl =
