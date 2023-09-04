@@ -105,9 +105,11 @@ class LipadCheckout {
                         const response = JSON.parse(data);
                         if (response.access_token) {
                             const access_token = response.access_token;
-                            // console.log('Access Token', access_token);
-
                             resolve(access_token);
+                        } else if (res.statusCode === 401) {
+                            const errorMessage = "Invalid Credentials!";
+                            console.log(errorMessage);
+                            reject(new Error(errorMessage));
                         } else {
                             reject(new Error('Access token not found in response'));
                             console.log('Response', response);
@@ -149,6 +151,10 @@ class LipadCheckout {
                 res.on('end', () => {
                     if (res.statusCode === 200) {
                         resolve(JSON.parse(data));
+                    } else if (res.statusCode === 401) {
+                        const errorMessage = `Transaction with Merchant Transaction ID ${merchant_transaction_id} not found`;
+                        console.log(errorMessage);
+                        reject(new Error(errorMessage));
                     } else {
                         reject(new Error(`Request failed with status code ${res.statusCode}`));
                     }
