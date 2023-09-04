@@ -60,11 +60,11 @@ The `getCheckoutStatus` method includes access token retrieval.
 
 ## API
 
-### `LipadEncryption(ivKey, consumerSecret)`
+### `LipadCheckout(IVKey, consumerSecret)`
 
 Creates an instance of the LipadEncryption class.
 
-- `ivKey`: The IV key used for encryption.
+- `IVKey`: The IV key used for encryption.
 - `consumerSecret`: The secret key used for encryption.
 
 ### `encrypt(payload)`

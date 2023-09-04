@@ -63,15 +63,7 @@ class LipadCheckout {
         const result = Buffer
             .concat([cipher.update(payload), cipher.final()]);
 
-        var base64Str = Buffer
-            .from(result, 'binary')
-            .toString('base64');
-
-        var base64Str2 = Buffer
-            .from(base64Str, 'binary')
-            .toString('base64');
-
-        return base64Str2;
+        return result.toString('base64');
     }
 
     async getAccessToken(consumerKey, consumerSecret) {
@@ -174,8 +166,7 @@ class LipadCheckout {
         try {
             const access_token = await this.getAccessToken(consumerKey, consumerSecret);
             console.log('Access Token', access_token);
-            const status = await this.checkCheckoutStatus(merchant_transaction_id, access_token, payload);
-            return status;
+            return await this.checkCheckoutStatus(merchant_transaction_id, access_token, payload);
         } catch (error) {
             console.error('Error:', error);
             throw error;
