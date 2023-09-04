@@ -166,8 +166,8 @@ class LipadEncryption {
 
     async getCheckoutStatus(merchant_transaction_id, consumerKey, consumerSecret, payload) {
         try {
-            const access_token = await this.getAccessToken(consumerKey, consumerSecret, payload);
-            const status = await this.checkCheckoutStatus(merchant_transaction_id, access_token);
+            const access_token = await this.getAccessToken(consumerKey, consumerSecret);
+            const status = await this.checkCheckoutStatus(merchant_transaction_id, access_token, payload);
             return status;
         } catch (error) {
             console.error('Error:', error);
