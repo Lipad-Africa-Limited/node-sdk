@@ -1,4 +1,4 @@
-const LipadEncryption = require('../encryption/encryption');
+const LipadCheckout = require('../checkout/checkout');
 const accessKey = "t9BbimKKJebKnjEya34iN68xtipG7j";
 const IVKey = "p6BbimKKJebKnjEya34iN68xtipG7j";
 const consumerSecret = "C6BbimKKJebKnjEya34iN68xtipG7j";
@@ -26,18 +26,18 @@ let payload = {
     service_code: "DEMCHE1"
 };
 
-// Create an instance of LipadEncryption
-let encryption = new LipadEncryption.Encryption(IVKey, consumerSecret);
+// Create an instance of LipadCheckout
+let checkout = new LipadCheckout.Checkout(IVKey, consumerSecret);
 
 async function main() {
     try {
         // Validate payload before encrypting
-        encryption.validatePayload(payload);
+        checkout.validatePayload(payload);
 
         const payloadStr = JSON.stringify(payload);
 
         // Encrypt the payload
-        let encryptedPayload = encryption.encrypt(payloadStr);
+        let encryptedPayload = checkout.encrypt(payloadStr);
         // console.log('Encrypted Payload', encryptedPayload);
 
         // Build the checkout URL
@@ -50,7 +50,7 @@ async function main() {
         console.log('Checkout URL', checkoutUrl);
 
         // Get checkout status and Access Token
-        const checkoutData = await encryption.getCheckoutStatus(payload.merchant_transaction_id, consumerKey, consumerSecret, payload);
+        const checkoutData = await checkout.getCheckoutStatus(payload.merchant_transaction_id, consumerKey, consumerSecret, payload);
         console.log('Checkout Status', checkoutData);
     } catch (error) {
         console.error('Error:', error);
