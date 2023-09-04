@@ -1,34 +1,37 @@
 const crypto = require("crypto");
 const https = require('https');
 const querystring = require('querystring');
-class LipadEncryption{
+
+class LipadEncryption {
     constructor(ivKey, consumerSecret) {
         this.IVKey = ivKey;
         this.consumerSecret = consumerSecret;
         this.algorithm = "aes-256-cbc";
     }
-validatePayload(obj){
+
+    validatePayload(obj) {
         const requiredKeys = [
-        "msisdn",
-        "account_number",
-        "country_code",
-        "currency_code",
-        "client_code",
-        "due_date",
-        "customer_email",
-        "customer_first_name",
-        "customer_last_name",
-        "merchant_transaction_id",
-        "preferred_payment_option_code",
-        "callback_url",
-        "request_amount",
-        "request_description",
-        "success_redirect_url",
-        "fail_redirect_url",
-        "invoice_number",
-        "language_code",
-        "service_code",
-];
+            "msisdn",
+            "account_number",
+            "country_code",
+            "currency_code",
+            "client_code",
+            "due_date",
+            "customer_email",
+            "customer_first_name",
+            "customer_last_name",
+            "merchant_transaction_id",
+            "preferred_payment_option_code",
+            "callback_url",
+            "request_amount",
+            "request_description",
+            "success_redirect_url",
+            "fail_redirect_url",
+            "invoice_number",
+            "language_code",
+            "service_code",
+        ];
+
         for (const key of requiredKeys) {
             if (!(key in obj)) {
                 throw new Error(`Missing required key: ${key}`);
@@ -36,7 +39,7 @@ validatePayload(obj){
         }
     }
 
-    encrypt(payload){
+    encrypt(payload) {
         let secret = crypto
             .createHash('sha256')
             .update(this.consumerSecret)
@@ -60,16 +63,15 @@ validatePayload(obj){
         const result = Buffer
             .concat([cipher.update(payload), cipher.final()]);
 
-        var base64Str= Buffer
+        var base64Str = Buffer
             .from(result, 'binary')
             .toString('base64');
 
-        var base64Str2= Buffer
+        var base64Str2 = Buffer
             .from(base64Str, 'binary')
             .toString('base64');
 
         return base64Str2;
-
     }
 
     async getAccessToken(consumerKey, consumerSecret) {
@@ -98,16 +100,19 @@ validatePayload(obj){
                     data += chunk;
                 });
 
-                res.on('end', () => {
+                res.on('end', async () => {
                     try {
                         const response = JSON.parse(data);
                         if (response.access_token) {
-                            resolve(response.access_token);
+                            const access_token = response.access_token;
+                            // console.log('Access Token', access_token);
+
+                            resolve(access_token);
                         } else {
                             reject(new Error('Access token not found in response'));
                             console.log('Response', response);
                         }
-                    } catch (error){
+                    } catch (error) {
                         reject(new Error('Error parsing JSON response:' + error.message));
                     }
                 });
@@ -123,7 +128,7 @@ validatePayload(obj){
         });
     }
 
-    async getCheckoutStats(merchant_transaction_id, access_token) {
+    async checkCheckoutStatus(merchant_transaction_id, access_token) {
         const apiUrl = `https://uat.checkout-api.lipad.io/api/v1/checkout/request/status?merchant_transaction_id=${merchant_transaction_id}`;
 
         return new Promise((resolve, reject) => {
@@ -142,7 +147,11 @@ validatePayload(obj){
                 });
 
                 res.on('end', () => {
-                    resolve(JSON.parse(data));
+                    if (res.statusCode === 200) {
+                        resolve(JSON.parse(data));
+                    } else {
+                        reject(new Error(`Request failed with status code ${res.statusCode}`));
+                    }
                 });
             });
 
@@ -154,12 +163,11 @@ validatePayload(obj){
             req.end();
         });
     }
-    async getCheckoutStatus(merchant_transaction_id, consumerKey, consumerSecret) {
+
+    async getCheckoutStatus(merchant_transaction_id, consumerKey, consumerSecret, payload) {
         try {
-            const access_token = await this.getAccessToken(consumerKey, consumerSecret);
-            console.log('Access Token', access_token);
-            const status = await this.getCheckoutStats(merchant_transaction_id, access_token);
-            console.log('Checkout Status:', status);
+            const access_token = await this.getAccessToken(consumerKey, consumerSecret, payload);
+            const status = await this.checkCheckoutStatus(merchant_transaction_id, access_token);
             return status;
         } catch (error) {
             console.error('Error:', error);
@@ -167,4 +175,6 @@ validatePayload(obj){
         }
     }
 }
+
 module.exports.Encryption = LipadEncryption;
+
