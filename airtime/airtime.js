@@ -40,10 +40,6 @@ async function main() {
         let encryptedPayload = encryption.encrypt(payloadStr);
         // console.log('Encrypted Payload', encryptedPayload);
 
-        // Get access token
-        const access_token = await encryption.getAccessToken(consumerKey, consumerSecret);
-        console.log('Access Token', access_token);
-
         // Build the checkout URL
         const checkoutUrl =
             'https://checkout2.dev.lipad.io/?access_key=' +
@@ -53,7 +49,7 @@ async function main() {
 
         console.log('Checkout URL', checkoutUrl);
 
-        // Get checkout status
+        // Get checkout status and Access Token
         const checkoutData = await encryption.getCheckoutStatus(payload.merchant_transaction_id, consumerKey, consumerSecret, payload);
         console.log('Checkout Status', checkoutData);
     } catch (error) {
