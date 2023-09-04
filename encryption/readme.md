@@ -4,14 +4,17 @@ The LipadEncryption class provides a simple way to encrypt payloads using the gi
 
 ## Installation
 
-This class relies on the built-in crypto module, so no additional installations are required.
+This class relies on the built-in `crypto` and `https` modules, so no additional installations are required.
 
 ## Usage
 
-1. **Import the LipadEncryption class:**
+1. **Import the LipadEncryption class and other required modules:**
 
     ```javascript
-    const Encryption = require("lipad-encryption");
+    const crypto = require("crypto");
+    const https = require('https');
+    const querystring = require('querystring');
+    const { LipadEncryption } = require('./path/to/LipadEncryption'); // Adjust the path accordingly
     ```
 
 2. **Create an instance of LipadEncryption by providing the required parameters:**
@@ -19,46 +22,69 @@ This class relies on the built-in crypto module, so no additional installations 
     ```javascript
     const ivKey = "your_IV_key";
     const consumerSecret = "your_secret_key";
-
-   let payload = {};
-    let encryption = new LipadEncryption.Encryption(IVKey, consumerSecret);
+    const encryption = new LipadEncryption(ivKey, consumerSecret);
     ```
 
-3. **Validate a payload using the validatePayload method:**
+3. **Validate a payload using the `validatePayload` method:**
 
     ```javascript
-    encryption.validatePayload(payload);
+    const payload = {
+        // Your payload properties
+    };
+
+    try {
+        encryption.validatePayload(payload);
+        console.log("Payload is valid.");
+    } catch (error) {
+        console.error("Payload validation error:", error.message);
+    }
     ```
 
-4. **Encrypt a payload using the encrypt method:**
+4. **Encrypt a payload using the `encrypt` method:**
 
     ```javascript
     const payload = "your_payload";
-    let encryptedPayload = encryption.encrypt(payloadStr);
+    const encryptedPayload = encryption.encrypt(payload);
 
     console.log("Encrypted Payload:", encryptedPayload);
     ```
 
-5. **Retrieve checkout status using the getCheckoutStats method:**
+5. **Retrieve access token using the `getAccessToken` method:**
 
     ```javascript
-    encryption.getCheckoutStats(payload.merchant_transaction_id, accessToken)
-    .then(checkoutData => {
-        console.log('Checkout Data:', checkoutData);
-    })
-    .catch(error => {
+    const consumerKey = "your_consumer_key";
+    const consumerSecret = "your_consumer_secret";
+
+    try {
+        const accessToken = await encryption.getAccessToken(consumerKey, consumerSecret, payload);
+        console.log('Access Token:', accessToken);
+    } catch (error) {
         console.error('Error:', error);
-    });
+    }
+    ```
+
+6. **Retrieve checkout status using the `getCheckoutStatus` method:**
+
+    ```javascript
+    const merchant_transaction_id = "your_transaction_id";
+
+    try {
+        const checkoutData = await encryption.getCheckoutStatus(merchant_transaction_id, consumerKey, consumerSecret, payload);
+        console.log('Checkout Status:', checkoutData);
+    } catch (error) {
+        console.error('Error:', error);
+    }
     ```
 
 ## API
 
-### `LipadEncryption(ivKey, consumerSecret)`
+### `LipadEncryption(IVKey, consumerSecret)`
 
 Creates an instance of the LipadEncryption class.
 
-- `ivKey`: The IV key used for encryption.
+- `IVKey`: The IV key used for encryption.
 - `consumerSecret`: The secret key used for encryption.
+
 ### `encrypt(payload)`
 
 Encrypts a given payload.
@@ -75,48 +101,23 @@ Validates the required properties of a given payload object.
 
 Throws an error if any required property is missing.
 
-### `getCheckoutStats(merchant_transaction_id, accessToken)`
+### `getAccessToken(consumerKey, consumerSecret, payload)`
+
+Retrieves an access token for authentication.
+
+- `consumerKey`: The consumer key for authentication.
+- `consumerSecret`: The consumer secret for authentication.
+- `payload`: The payload to be included in the request.
+
+Returns a Promise that resolves with the access token.
+
+### `getCheckoutStatus(merchant_transaction_id, consumerKey, consumerSecret, payload)`
 
 Retrieves checkout status for a specific merchant transaction ID.
 
 - `merchant_transaction_id`: The ID of the merchant transaction.
-- `accessToken`: The access token for authentication.
+- `consumerKey`: The consumer key for authentication.
+- `consumerSecret`: The consumer secret for authentication.
+- `payload`: The payload to be included in the request.
 
 Returns a Promise that resolves with the checkout data.
-
-## Example
-
-```javascript
-const { Encryption } = require("lipad-encryption");
-
-const IVKey = "your_IV_key";
-const consumerSecret = "your_secret_key";
-
-const lipadEncryption = new Encryption(IVKey, consumerSecret);
-
-const payload = "your_payload";
-const encryptedPayload = lipadEncryptor.encrypt(payload);
-
-console.log("Encrypted Payload:", encryptedPayload);
-
-const payloadToValidate = {
-    // your payload properties
-};
-
-try {
-    lipadEncryption.validatePayload(payloadToValidate);
-    console.log("Payload is valid.");
-} catch (error) {
-    console.error("Payload validation error:", error.message);
-}
-
-const merchant_transaction_id = "your_transaction_id";
-const accessToken = "your_access_token";
-
-lipadEncryption.getCheckoutStats(merchant_transaction_id, accessToken)
-    .then(checkoutData => {
-        console.log("Checkout Data:", checkoutData);
-    })
-    .catch(error => {
-        console.error("Error:", error);
-    });
