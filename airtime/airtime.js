@@ -14,7 +14,7 @@ let payload = {
     customer_email: "johndoe@mail.com",
     customer_first_name: "John",
     customer_last_name: "Doe",
-    merchant_transaction_id: "36",
+    merchant_transaction_id: "60",
     preferred_payment_option_code: "",
     callback_url: "https://webhook.site/6c933f61-d6da-4f8e-8a44-bf0323eb8ad6",
     request_amount: "100",
