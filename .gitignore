@@ -1,4 +1,6 @@
-.idea/.gitignore
+.idea/
+.gitignore
 /node_modules
 package.json
 .env
+airtime
